@@ -1,0 +1,73 @@
+1. TensorFlow개념
+머신러닝 ->지도 학습->회귀(독립(원인)+종속(결과,수치)data 사용)
+알고리즘 : 의사결정나무, RandomForest, SVM, NeuralNetwork = 딥러닝
+라이브러리 : TensorFlow (딥려닝 사용)
+순서 : 과거 데이터 준비(원인,결과) ->모델 모양 제작(입력갯수,출력 갰수) -> 데이터로 모델 학습(반복학습) -> 모델 이용(예측)
+
+2. 모델 모양 제작
+1) 남의 모델 사용 (https://www.tensorflow.org/)
+2) 직접 만들기
+        // 1. 과거의 데이터를 준비합니다. 
+        var 온도 = [20,21,22,23];         	
+        var 판매량 = [40,42,44,46];		
+        var 원인 = tf.tensor(온도);	->독립변수
+        var 결과 = tf.tensor(판매량);	->종속변수
+ 
+        // 2. 모델의 모양을 만듭니다. 
+        var X = tf.input({ shape: [1] });			->입력 갯수 1
+        var Y = tf.layers.dense({ units: 1 }).apply(X);	->출력 갯수 1
+        var model = tf.model({ inputs: X, outputs: Y });	->모양 만들기
+        var compileParam = { optimizer: tf.train.adam(), loss: tf.losses.meanSquaredError }	->최적화(optimizer), 정확도 측정방법(loss)
+        model.compile(compileParam);			->최종 모델 모양 만들기
+ 
+        // 3. 데이터로 모델을 학습시킵니다. 
+        var fitParam = { 
+            epochs: 100, 			-> 반복학습 100번
+            callbacks:{
+                onEpochEnd:
+                    function(epoch, logs){		->로그보기
+                        console.log('epoch', epoch, logs,'RMSE=>',Math.sqrt(logs.loss));	->정확도 측정(RMSE: 차이의 평균의 제곱의 루트) = RootMeanSquaredError
+
+        // 4. 새로운 데이터를 이용
+        var 다음주온도 = [15,16,17, 18, 19]
+        var 다음주원인 = tf.tensor(다음주온도);
+        var 다음주결과 = model.predict(다음주원인);
+        다음주결과.print();
+
+값이 이상하면 학습횟수 증가시키기
+
+
+3. 모델의 구조
+1) 구조 : weight(가중치) * 값 + bias(편향) 
+2) 보는 방법 
+var weight = model.getWeights()[0].arraySync()[0][0];
+var bias = model.getWeights()[1].arraySync()[0];
+
+
+4. 모델 저장 및 로드
+파일 다운로드 : model.save('downloads://제목);
+로컬 저장소 : model.save('downloads://제목);
+로드 후 예측 : tf.loadLayersModel('localstorage://제목').then(function(model){model.predict(tf.tensor([값])).print();});
+
+5. 여러개 변수
+원인 = [[1,2,3,4,5,6],[1,2,3,4,5,6]]
+결과 = [[1],[2]]
+모델모양 입력,출력 갯수 조절
+
+6. 시각화(요약,loss로그기록)
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>   -> import
+요약 : tfvis.show.modelSummary({name:'요약', tab:'모델'}, model);    ->(모델 만들기 끝에 위치)
+loss 로그기록 : ->학습에 위치
+ var _history = []
+ _history.push(logs);    //로그기록
+tfvis.show.history({name:'loss', tab:'역사'},_history,['loss']);    //제목loss, 역사tab에 로그기록 시각화 
+
+7. 딥러닝
+ANN(인공신경망) 
+layer : node 그룹
+layer 종류 : input, hidden(중간), output
+hidden layer 찾는게 중요
+
+
+
+

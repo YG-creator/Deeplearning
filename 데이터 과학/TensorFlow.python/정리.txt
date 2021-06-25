@@ -1,0 +1,93 @@
+1. 회귀
+colab 사용
+
+# 라이브러리 사용
+import tensorflow as tf
+import pandas as pd
+
+#1.과거 데이터 준비
+파일경로 = 'https://raw.githubusercontent.com/blackdew/tensorflow1/master/csv/boston.csv'
+보스턴 = pd.read_csv(파일경로)
+
+# 독립변수, 종속변수 분리 
+독립 = 보스턴[['crim', 'zn', 'indus', 'chas', 'nox', 'rm', 'age', 'dis', 'rad', 'tax',
+            'ptratio', 'b', 'lstat']]
+종속 = 보스턴[['medv']]
+
+# 2. 모델의 구조를 만듭니다
+X = tf.keras.layers.Input(shape=[13])
+Y = tf.keras.layers.Dense(1)(X)
+model = tf.keras.models.Model(X, Y)
+model.compile(loss='mse')
+
+# 3.데이터로 모델을 학습(FIT)합니다.
+model.fit(독립, 종속, epochs=2000, verbose=0)  #verbose = 0 출력 ㄴㄴ
+
+# 4. 모델을 이용합니다
+print(model.predict(독립[5:10]))
+# 종속변수 확인
+print(종속[5:10])
+
+# 모델의 수식(가중치,편향) 확인
+print(model.get_weights())
+
+
+
+2. 딥러닝 원리
+1.임의로 W(weight),B(bias) 설정
+2. Loss 계산
+3. 임의로 dt 설정
+4. W+dt-> dLoss/dt = dLoss / dW로 설정->next W
+5. B+dt-> dLoss/dt = dLoss / dB로 설정->next B
+반복
+
+
+3. 분류
+1) 과거 데이터(독립+종속(범주형))준비
+원핫 인코딩 ->범주형 데이터를 표를 이용하여 숫자로 표현 가능->종속변수 갯수가 늘어남
+softmax(수) ->수를 0과 1로 
+2) 모델 구조 만들기
+loss = crossentropy
+accuracy 지표
+3) 학습
+4) 이용
+
+
+4. 히든레이어
+1)모델 구조 만들기 다름
+input(X)->n * hidden(H)->output(Y)
+activation = swish
+
+
+5. 데이터 타입 조정
+1) 변수(칼럼) 타입 확인: 데이터.dtypes
+2) 변수를 범주형으로 변경:
+데이터['칼럼명'].astype('category')
+3) 변수를 수치형으로 변경:
+데이터['칼럼명'].astype('int')
+데이터['칼럼명'].astype('float')
+4) NA 값의 처리
+NA 갯수 체크: 데이터.isna().sum()
+NA 값 채우기: 데이터['칼럼명'].fillna(특정숫자)
+
+
+
+6. 학습이 잘되는 모델
+모델 구조 만들기
+1) 전
+X = tf.keras.layers.Input(shape=[13])
+H = tf.keras.layers.Dense(8, activation='swish')(X)
+H = tf.keras.layers.Dense(8, activation='swish')(H)
+Y = tf.keras.layers.Dense(1)(H)
+
+2) 후
+X = tf.keras.layers.Input(shape=[13])
+H = tf.keras.layers.Dense(8)(X)
+H = tf.keras.layers.BatchNormalization()(H)
+H = tf.keras.layers.Activation('swish')(H)
+
+H = tf.keras.layers.Dense(8)(H)
+H = tf.keras.layers.BatchNormalization()(H)
+H = tf.keras.layers.Activation('swish')(H)
+
+Y = tf.keras.layers.Dense(1)(H)

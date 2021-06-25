@@ -1,0 +1,1 @@
+vscode에서 open with linked server로 파일 열기

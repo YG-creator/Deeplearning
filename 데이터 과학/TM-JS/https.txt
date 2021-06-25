@@ -1,0 +1,1 @@
+vscode로 https연결 :TERMINAL 에서 ws --https --port 9999 --open
